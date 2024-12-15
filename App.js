@@ -9,7 +9,7 @@ export default function App() {
     <SafeAreaView>
       <View style={styles.container}>
       <View style={{flexDirection: 'row', elevation: 3, paddingHorizontal: 20, display: 'flex', alignItems: 'center', height: 80, width: '100%', backgroundColor:'#FFF'}}>
-        <Image source={require('./assets/icon.png')} style={{width: 46, height: 46}}></Image>
+        <Image source={require('./assets/fotoprofil.png')} style={{width: 46, height: 46, borderRadius:100, borderWidth:3, borderColor:'teal'}}></Image>
         <View style={{ marginLeft: 20}}>
           <Text style={{color: 'black', fontWeight: 700}}>Chelsea</Text>
           <Text >Personal Account</Text>
@@ -31,15 +31,51 @@ export default function App() {
       <Text style={{fontSize:15, marginLeft:1, color:'#FFF'}}>Account No.</Text>
       <Text style={{fontSize:15, marginRight: 1,color:'#FFF'}}>100899</Text>
     </View>
-    <View style={{margin:20,marginTop:5,width:337, height:120, marginTop:40,borderRadius:20,display:'flex', flexDirection: 'row', elevation:2, justifyContent:'space-between', alignItems:'center', paddingHorizontal:30, backgroundColor:'#FFF'}}>
+    <View style={{margin:20,marginTop:5,width:337, height:120, marginTop:15,borderRadius:20,display:'flex', flexDirection: 'row', elevation:2, justifyContent:'space-between', alignItems:'center', paddingHorizontal:30, backgroundColor:'#FFF'}}>
     <View>
       <Text style={{fontSize:14}}>Balance</Text>
-      <Text style={{fontSize:24}}>Rp 10.000.000</Text>
+      <Text style={{fontSize:24}}>Rp 10.000.000 <Feather name="eye" size={20} color="grey" /> </Text>
     </View>
     <View>
     <View style={{width:39, height:39, backgroundColor:'teal', borderRadius:8, padding:10, marginBottom:5}}><AntDesign name="plus" size={20} color="white" marginBottom={0} marginTop={0}/></View>
     <View style={{width:39, height:39, backgroundColor:'teal', borderRadius:8}}><Feather name="send" size={20} color="white" margin={9}/></View>
     </View>
+    </View>
+    <View style={styles.containertransaction}>
+      <Text style={styles.header}>Transaction History</Text>
+
+      {/* Transaction Item 1 */}
+      <View style={styles.transactionItem}>
+      <Image source={require('./assets/robclinton.jpeg')} style={{width: 44, height: 44, borderRadius:100}}></Image>
+        <View style={styles.details}>
+          <Text style={styles.name}>Adityo Gizwaanda</Text>
+          <Text style={styles.type}>Transfer</Text>
+          <Text style={styles.date}>08 December 2024</Text>
+        </View>
+        <Text style={[styles.amount, { color: 'red' }]}>- 75.000,00</Text>
+      </View>
+
+      {/* Transaction Item 2 */}
+      <View style={styles.transactionItem}>
+      <Image source={require('./assets/robclinton.jpeg')} style={{width: 44, height: 44, borderRadius:100}}></Image>
+        <View style={styles.details}>
+          <Text style={styles.name}>Adityo Gizwaanda</Text>
+          <Text style={styles.type}>Topup</Text>
+          <Text style={styles.date}>08 December 2024</Text>
+        </View>
+        <Text style={[styles.amount, { color: 'green' }]}>+ 75.000,00</Text>
+      </View>
+
+      {/* Transaction Item 3 */}
+      <View style={styles.transactionItem}>
+      <Image source={require('./assets/robclinton.jpeg')} style={{width: 44, height: 44, borderRadius:100}}></Image>
+        <View style={styles.details}>
+          <Text style={styles.name}>Adityo Gizwaanda</Text>
+          <Text style={styles.type}>Transfer</Text>
+          <Text style={styles.date}>08 December 2024</Text>
+        </View>
+        <Text style={[styles.amount, { color: 'red' }]}>- 75.000,00</Text>
+      </View>
     </View>
     </SafeAreaView>
   );
@@ -54,7 +90,54 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFBFD',
     width : 381,
     height:68
-  }
+  },
+  containertransaction: {
+    padding : 16,
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    elevation: 3,
+    width:337,
+    marginTop:2,
+    marginLeft:22
+  },
+  header: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  circle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e0e0e0', // Grey placeholder
+    marginRight: 10,
+  },
+  details: {
+    flex: 1,
+    marginLeft:6
+  },
+  name: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  type: {
+    fontSize: 12,
+    color: '#757575',
+  },
+  date: {
+    fontSize: 10,
+    color: '#9e9e9e',
+  },
+  amount: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
 
 
