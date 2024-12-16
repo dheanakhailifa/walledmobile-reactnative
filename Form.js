@@ -1,18 +1,18 @@
-import { StyleSheet, Text, TextInput, View, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
 import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, View, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Register from './Register';
-import Login from './Login'
+import ModalComp from './Modal';
 
 export default function Form({ state }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
-  const [isSelected, setSelection] = useState(false)
+  const [isSelected, setIsSelected] = useState(false);
   const [errors, setErrors] = useState({});
+  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   // Validation logic
   const handleNameChange = (text) => {
@@ -23,6 +23,7 @@ export default function Form({ state }) {
       setErrors((prevErrors) => ({ ...prevErrors, name: null }));
     }
   };
+
   const handleEmailChange = (text) => {
     setEmail(text);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
@@ -42,83 +43,90 @@ export default function Form({ state }) {
   };
 
   const redirectScreen = () => {
-    console.log(Object.keys(errors).length)
-    console.log(Object.entries(errors).filter(([,value])=> value !==null).length)
-    if (Object.entries(errors).filter(([,value])=> value !==null).length === 0) { // Periksa jika tidak ada error
-        if (state === 'login') {
-            navigation.navigate("Home");
-        } else {
-            navigation.navigate("Login");
-        }
+    if (Object.entries(errors).filter(([, value]) => value !== null).length === 0) {
+      if (state === 'login') {
+        navigation.navigate('Home');
+      } else {
+        navigation.navigate('Login');
+      }
     }
-}
+  };
 
   return (
     <SafeAreaView>
-    <KeyboardAvoidingView>
-        <Image source={require('./assets/walled.png')} style={{width:233, height: 57, alignSelf:'center', marginTop:120}}></Image>
-      <View style={{ marginTop: 80, marginBottom:0}}>
-        {state === 'register' && (
+      {/* Pass modalVisible and setModalVisible as props */}
+      <ModalComp modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <KeyboardAvoidingView>
+        <Image source={require('./assets/walled.png')} style={{ width: 233, height: 57, alignSelf: 'center', marginTop: 120 }} />
+        <View style={{ marginTop: 80 }}>
+          {state === 'register' && (
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              value={name}
+              onChangeText={handleNameChange}
+            />
+          )}
+          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
           <TextInput
             style={styles.input}
-            placeholder="Name"
-            value={name}
-            onChangeText={handleNameChange}
-          />
-        )}
-        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-
-        {/* Email Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={handleEmailChange}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
-        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-
-        {/* Password Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={handlePasswordChange}
-          autoCorrect={false}
-          autoCapitalize="none"
-          secureTextEntry
-        />
-        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-
-        {state === 'register' && (
-          <TextInput
-            style={styles.input}
-            placeholder="Avatar URL"
-            onChangeText={setAvatarUrl}
+            placeholder="Email"
+            value={email}
+            onChangeText={handleEmailChange}
             autoCorrect={false}
             autoCapitalize="none"
           />
-        )}
-      </View>
+          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-      {/* checkbox */}
-      <TouchableOpacity
-        style={styles.checkboxContainer}
-        onPress={() => setSelection(!isSelected)}
-        >
-        <View style={[styles.checkbox, isSelected && styles.checkedCheckbox]} />
-        <Text style={styles.label}>I agree to the terms and conditions</Text>
-      </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={handlePasswordChange}
+            autoCorrect={false}
+            autoCapitalize="none"
+            secureTextEntry
+          />
+          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-      <TouchableOpacity
-        onPress={() => {redirectScreen()} }
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>{state === 'login' ? 'Login' : 'Register'}</Text>
-      </TouchableOpacity>
+          {state === 'register' && (
+            <TextInput
+              style={styles.input}
+              placeholder="Avatar URL"
+              onChangeText={setAvatarUrl}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          )}
+        </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 25, marginTop: 5 }}>
+        {state === 'register' && (
+  <TouchableOpacity
+    onPress={() => setIsSelected(!isSelected)}
+    style={styles.agreementContainer}
+    activeOpacity={0.8}
+  >
+    <View style={[styles.checkbox, isSelected && styles.checkedCheckbox]} />
+    <View style={styles.textContainer}>
+      <Text style={styles.agreementText}>
+        I have read and agree to the{' '}
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Text style={styles.linkText}>Terms and Conditions</Text>
+        </TouchableOpacity>
+      </Text>
+    </View>
+  </TouchableOpacity>
+)}
+
+
+
+
+        <TouchableOpacity onPress={redirectScreen} style={styles.button}>
+          <Text style={styles.buttonText}>{state === 'login' ? 'Login' : 'Register'}</Text>
+        </TouchableOpacity>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 25, marginTop: 5 }}>
         <Text style={{ textAlign: 'left' }}>
           {state === 'login' ? "Don’t have account?" : 'Have an account?'}
         </Text>
@@ -167,23 +175,44 @@ const styles = StyleSheet.create({
     color: 'red',
     marginLeft: 22,
     marginTop: 5,
-    fontSize:10
+    fontSize: 10,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft:24,
-    marginBottom:0,
-    marginTop:50
+    marginLeft: 24,
+    marginTop: 50,
   },
   checkbox: {
-    height: 24,
-    width: 24,
-    borderWidth: 2,
-    borderColor: '#000',
-    marginRight: 8,
+    width: 16, // Match font size
+    height: 16, // Match font size
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: 4, // Optional: for rounded checkbox
+    marginRight: 8, // Add space between checkbox and text
+  },
+  checkbox: {
+    width: 16,
+    height: 16,
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: 4,
+    marginRight: 8, // Space between checkbox and text
   },
   checkedCheckbox: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'teal',
+    borderColor: 'teal',
+  },
+  textContainer: {
+    flexShrink: 1, // Allow text to shrink instead of wrapping
+  },
+  agreementText: {
+    fontSize: 13,
+    color: '#000',
+    flexShrink: 1, // Text will adjust if space is constrained
+  },
+  linkText: {
+    color: 'teal',
+    fontSize: 13,
   },
 });

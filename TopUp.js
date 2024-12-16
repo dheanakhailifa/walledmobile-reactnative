@@ -1,120 +1,203 @@
-import { StyleSheet, Text, View, Image, ImageBackground, ScrollView, Button, SafeAreaView, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  SafeAreaView,
+  TouchableOpacity,
+  FlatList,
+  TouchableWithoutFeedback,
+} from 'react-native';
 
 export default function TopUp() {
-    return (
-        <SafeAreaView>
-            <View style={styles.container}>
-            <View style={{flexDirection: 'row', elevation: 3, paddingHorizontal: 20, display: 'flex', alignItems: 'center', height: 80, width: '100%', backgroundColor:'#FFF', marginTop:375}}>
-        <View style={{ marginLeft: 20}}>
-          <Text style={{color: 'black', fontWeight: 700, fontSize:20}}>Top Up</Text>
-        </View>
+  const [amount, setAmount] = useState(''); // State for amount
+  const [notes, setNotes] = useState('');  // State for notes
+  const [paymentMethod, setPaymentMethod] = useState('BYOND Pay'); // Default payment method
+  const [isDropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
+
+  const paymentMethods = ['BYOND Pay', 'Credit Card', 'Bank Transfer'];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Top Up</Text>
       </View>
+
       {/* Amount Section */}
-      <View style={{width:370, height:148, marginTop:30, marginBottom:0}}>
+      <View style={styles.card}>
         <Text style={styles.label}>Amount</Text>
         <View style={styles.inputWrapper}>
           <Text style={styles.currency}>IDR</Text>
           <TextInput
             style={styles.input}
-            value="100.000" // Hardcoded value
-            editable={false} // Input is non-editable
+            placeholder="Enter amount"
+            placeholderTextColor="#aaa"
+            keyboardType="numeric"
+            value={amount}
+            onChangeText={(text) => setAmount(text)}
           />
         </View>
       </View>
 
-      {/* Payment Method Dropdown */}
-      <View style={{width:370, height:51, marginTop:10}}>
+      {/* Payment Method Section */}
+      <View style={styles.card}>
         <Text style={styles.label}>Payment Method</Text>
-        <View style={styles.dropdown}>
-          <Text style={styles.dropdownText}>BYOND Pay</Text>
+        <TouchableOpacity
+          style={styles.dropdown}
+          onPress={() => setDropdownVisible(!isDropdownVisible)} // Toggle dropdown visibility
+        >
+          <Text style={styles.dropdownText}>{paymentMethod}</Text>
           <Text style={styles.dropdownArrow}>▼</Text>
-        </View>
+        </TouchableOpacity>
+
+        {/* Dropdown List */}
+        {isDropdownVisible && (
+          <FlatList
+            data={paymentMethods}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setPaymentMethod(item); // Set selected payment method
+                  setDropdownVisible(false); // Hide dropdown after selection
+                }}
+              >
+                <View style={styles.dropdownItem}>
+                  <Text style={styles.dropdownItemText}>{item}</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
+          />
+        )}
       </View>
 
-      {/* Notes Section
-      <View style={{width:370, heigth:600, marginTop:20}}>
-        <Text style={{color:'black', fontSize:16}}>Notes</Text>
-        <Text
+      {/* Notes Section */}
+      <View style={styles.card}>
+        <Text style={styles.label}>Notes</Text>
+        <TextInput
           style={styles.notesInput}
-          placeholder="Enter Notes Here"
-          value="Sample Notes" 
+          placeholder="Enter notes"
+          placeholderTextColor="#aaa"
+          value={notes}
+          onChangeText={(text) => setNotes(text)}
         />
-      </View> */}
+      </View>
 
       {/* Top Up Button */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          console.log('Top Up button clicked.');
+        }}
+      >
         <Text style={styles.buttonText}>Top Up</Text>
       </TouchableOpacity>
-            </View>
-        </SafeAreaView>
-    )
-
+    </SafeAreaView>
+  );
 }
 
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingTop:80,
-      backgroundColor: '#FAFBFD',
-      width : 381,
-      height:68
-    },
-    section: {
-        marginBottom: 20, // Adds spacing between sections
-      },
-      label: {
-        fontSize: 14,
-        color: '#757575',
-        marginBottom: 8, // Adds spacing below the label
-      },
-      inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-      },
-      currency: {
-        fontSize: 18,
-        marginRight: 10,
-        color: '#333',
-      },
-      input: {
-        flex: 1,
-        fontSize: 18,
-        color: '#333',
-      },
-      dropdown: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 12,
-        backgroundColor: '#fff',
-      },
-      notesInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 12,
-        fontSize: 16,
-        color: '#333',
-      },
-      button: {
-        backgroundColor: '#008C8C',
-        paddingVertical: 14,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 80,
-        width:355,
-        height:52,
-        borderRadius:5
-      }
-})
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#FAFBFD',
+  },
+  header: {
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    elevation: 3,
+    marginBottom: 20,
+  },
+  headerText: {
+    color: '#000',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  card: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  label: {
+    fontSize: 14,
+    color: '#757575',
+    marginBottom: 8,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  currency: {
+    fontSize: 16,
+    marginRight: 10,
+    color: '#333',
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+  },
+  dropdown: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dropdownArrow: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dropdownItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  notesInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#008C8C',
+    paddingVertical: 14,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});

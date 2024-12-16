@@ -28,14 +28,15 @@ function TabNavigator() {
             }else if (route.name === "Topup"){
                 iconName = focused ? "home" : "home-outline";
             }
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <Ionicons name={iconName} size={size} color={'teal'} />;
           },
           tabBarActiveTintColor: "#007AFF",
           tabBarInactiveTintColor: "gray",
         })}
       >
-        <Tab.Screen name="Home" component={HomePage} />
-        <Tab.Screen name="TopUp" component={TopUp} />
+        <Tab.Screen name="TopUp" component={TopUp} options={{ headerShown: false }}/>
+        <Tab.Screen name="Home" component={HomePage} options={{ headerShown: false }}/>
+        <Tab.Screen name="Transfer" component={Transfer} options={{ headerShown: false }}/>
       </Tab.Navigator>
     );
   }
@@ -45,7 +46,6 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-        <Stack.Screen name="Transfer" component={Transfer} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen 
         name="Home"
