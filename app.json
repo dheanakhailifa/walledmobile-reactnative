@@ -19,10 +19,29 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.dheanakhailifa.bsi"
     },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          },
+          "ios": {
+            "flipper": true
+          }
+        }
+      ]
+    ],  
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "21507794-be21-41cd-b978-e9e7ffe37cfe"
+      }
     }
   }
 }

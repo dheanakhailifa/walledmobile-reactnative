@@ -9,14 +9,38 @@ import {
   FlatList,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { postsTransaction } from '../api/restApi';
+import { useAuth } from '../context/Auth';
 
 export default function TopUp() {
   const [amount, setAmount] = useState(''); // State for amount
   const [notes, setNotes] = useState('');  // State for notes
   const [paymentMethod, setPaymentMethod] = useState('BYOND Pay'); // Default payment method
   const [isDropdownVisible, setDropdownVisible] = useState(false); // State for dropdown visibility
+  const [type, setType] = useState("c")
 
   const paymentMethods = ['BYOND Pay', 'Credit Card', 'Bank Transfer'];
+  const {refresh, setRefresh} = useAuth() 
+
+  const handleTopUp = async () => {
+    setRefresh(false)
+    const payload = {
+      type: type,
+      from_to: paymentMethod,
+      amount : amount, 
+      description : notes
+    }
+    console.log(payload)
+    try {
+      const response = await postsTransaction(payload); // Ensure the payload matches API expectation
+      alert('Success', response.message)
+    } catch (error) {
+      console.log(error)
+      alert('Error', error.message)
+    } finally{
+      setRefresh(true)
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -46,7 +70,7 @@ export default function TopUp() {
         <Text style={styles.label}>Payment Method</Text>
         <TouchableOpacity
           style={styles.dropdown}
-          onPress={() => setDropdownVisible(!isDropdownVisible)} // Toggle dropdown visibility
+          onPress={() => setDropdownVisible(!isDropdownVisible)}
         >
           <Text style={styles.dropdownText}>{paymentMethod}</Text>
           <Text style={styles.dropdownArrow}>▼</Text>
@@ -60,8 +84,8 @@ export default function TopUp() {
             renderItem={({ item }) => (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  setPaymentMethod(item); // Set selected payment method
-                  setDropdownVisible(false); // Hide dropdown after selection
+                  setPaymentMethod(item); 
+                  setDropdownVisible(false);
                 }}
               >
                 <View style={styles.dropdownItem}>
@@ -88,9 +112,7 @@ export default function TopUp() {
       {/* Top Up Button */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          console.log('Top Up button clicked.');
-        }}
+        onPress={() => {handleTopUp()}}
       >
         <Text style={styles.buttonText}>Top Up</Text>
       </TouchableOpacity>
@@ -101,7 +123,8 @@ export default function TopUp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 16, // Use padding for screen adjustment
+    paddingTop: 20,
     backgroundColor: '#FAFBFD',
   },
   header: {
@@ -111,6 +134,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     elevation: 3,
     marginBottom: 20,
+    borderRadius: 10,
+    paddingHorizontal: 16, // Padding for flexible spacing
   },
   headerText: {
     color: '#000',
@@ -120,12 +145,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFF',
     borderRadius: 10,
-    padding: 15,
+    padding: 16, // Uniform padding
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2,
   },
   label: {
@@ -159,7 +180,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 12,
-    backgroundColor: '#fff',
   },
   dropdownText: {
     fontSize: 16,
@@ -170,11 +190,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   dropdownItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    backgroundColor: '#fff',
   },
   dropdownItemText: {
     fontSize: 16,
@@ -191,7 +210,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#008C8C',
     paddingVertical: 14,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
   },

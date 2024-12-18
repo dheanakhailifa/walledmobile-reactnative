@@ -7,13 +7,38 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { postsTransaction } from '../api/restApi';
+import { useAuth } from '../context/Auth';
 
 export default function Transfer() {
   const [amount, setAmount] = useState(''); // State for transfer amount
   const [notes, setNotes] = useState('');   // State for transfer notes
   const [recipient, setRecipient] = useState(''); // State for recipient number
   const balance = 10000000; // Example balance in IDR
+  const [type, setType] = useState("d")
 
+  const{refresh,setRefresh} = useAuth()
+
+  const handleTransfer = async () => {
+    setRefresh(false)
+      const payload = {
+        type: type,
+        from_to: recipient,
+        amount : amount, 
+        description : notes
+      }
+      console.log(payload)
+      try {
+        const response = await postsTransaction(payload); // Ensure the payload matches API expectation
+        alert('Success', response.message)
+      } catch (error) {
+        console.log(error)
+        alert('Error', error.message)
+      } finally {
+        setRefresh(true)
+      }
+    }
+  
   return (
     <SafeAreaView style={styles.container}>
       {/* Transfer Header */}
@@ -66,13 +91,7 @@ export default function Transfer() {
       {/* Transfer Button */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => {
-          console.log('Transfer Initiated:', {
-            recipient,
-            amount,
-            notes,
-          });
-        }}
+        onPress={() => (handleTransfer())}
       >
         <Text style={styles.buttonText}>Transfer</Text>
       </TouchableOpacity>
@@ -83,12 +102,17 @@ export default function Transfer() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 16, // Replaced margin with padding for responsive layout
+    paddingTop: 20,
     backgroundColor: '#F4F6F8',
   },
   header: {
     marginBottom: 20,
     alignItems: 'center',
+    paddingVertical: 10, // Padding added for better responsiveness
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 3,
   },
   headerText: {
     fontSize: 20,
@@ -98,18 +122,14 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 15,
+    padding: 16, // Uniform padding for better alignment
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 2,
   },
   label: {
     fontSize: 14,
     color: '#757575',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   input: {
     borderWidth: 1,
@@ -126,12 +146,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
   currency: {
     fontSize: 16,
     color: '#333',
-    marginRight: 5,
+    marginRight: 8,
   },
   amountInput: {
     flex: 1,
@@ -157,8 +177,9 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#008C8C',
     paddingVertical: 14,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
+    marginTop: 20,
   },
   buttonText: {
     color: '#fff',

@@ -1,63 +1,127 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, SafeAreaView, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
+import { 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  View, 
+  SafeAreaView, 
+  TouchableOpacity, 
+  KeyboardAvoidingView, 
+  Image 
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ModalComp from './Modal';
+import { login, register } from '../api/restApi';
+import { useAuth } from '../context/Auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Form({ state }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isSelected, setIsSelected] = useState(false);
   const [errors, setErrors] = useState({});
-  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  const { login: setLoginState } = useAuth();
+  const { register: setRegisterState } = useAuth();
 
   const navigation = useNavigation();
+
+  const handleSubmitLogin = (email, password) => {
+    // if (!email || !password) {
+    //   alert ('Validation Error', 'Email and Password are required')
+    //   console.log(123)
+    //   return 
+    // }
+    handleLogin()
+
+  }
+
+  const handleSubmitRegister = () => {
+    if (!name || !email || !password) {
+      alert('Validation Error', 'Name, Email, and Password are required');
+      return;
+    }
+    handleRegister(name, email, password);
+};
+
+const handleRegister = async (name, email, password, phoneNumber) => {
+  try {
+    const token  = await register(name, email, password, phoneNumber);
+  //   setRegisterState(token);
+   alert('Success', 'Register successful');
+    navigation.navigate('Login');
+  } catch (error) {
+    alert('Error', error);
+  }
+};
+
+  const handleLogin = async () => {
+    const payload = {
+      email: email,
+      password: password
+    }
+    console.log(payload)
+    try {
+      const response = await login(payload); // Ensure the payload matches API expectation
+      console.log("Token received:", response.data.token);
+      //navigation.navigate('Home');
+      // const token = typeof response.data.token === "string" ? response.data.token : JSON.stringify(response.data.token);
+      await AsyncStorage.setItem('userToken', response.data.token); // Use await for AsyncStorage
+      navigation.navigate('Home');
+      //console.log('tokenn', token)
+      // setLoginState(token)
+      //alert('Success', 'Login successful')
+      // navigation.navigate('Home');
+    } catch (error) {
+      console.log(error)
+      alert('Error', error.message)
+    }
+  }
 
   // Validation logic
   const handleNameChange = (text) => {
     setName(text);
-    if (text.length < 3) {
-      setErrors((prevErrors) => ({ ...prevErrors, name: 'Name must be at least 3 characters' }));
-    } else {
-      setErrors((prevErrors) => ({ ...prevErrors, name: null }));
-    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      name: text.length < 3 ? 'Name must be at least 3 characters' : null,
+    }));
   };
 
   const handleEmailChange = (text) => {
     setEmail(text);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
-      setErrors((prevErrors) => ({ ...prevErrors, email: 'Invalid email format' }));
-    } else {
-      setErrors((prevErrors) => ({ ...prevErrors, email: null }));
-    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text) ? null : 'Invalid email format',
+    }));
   };
 
   const handlePasswordChange = (text) => {
     setPassword(text);
-    if (text.length < 7) {
-      setErrors((prevErrors) => ({ ...prevErrors, password: 'Password must be at least 7 characters' }));
-    } else {
-      setErrors((prevErrors) => ({ ...prevErrors, password: null }));
-    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      password: text.length < 7 ? 'Password must be at least 7 characters' : null,
+    }));
   };
 
-  const redirectScreen = () => {
-    if (Object.entries(errors).filter(([, value]) => value !== null).length === 0) {
-      if (state === 'login') {
-        navigation.navigate('Home');
-      } else {
-        navigation.navigate('Login');
-      }
-    }
-  };
+  // const redirectScreen = () => {
+  //   const hasErrors = Object.values(errors).some((error) => error !== null);
+  //   if (!hasErrors) {
+  //     if (state === 'login') {
+  //     } else {
+  //       navigation.navigate('Login');
+  //     }
+  //   }
+  // };
 
   return (
     <SafeAreaView>
       {/* Pass modalVisible and setModalVisible as props */}
       <ModalComp modalVisible={modalVisible} setModalVisible={setModalVisible} />
       <KeyboardAvoidingView>
-        <Image source={require('./assets/walled.png')} style={{ width: 233, height: 57, alignSelf: 'center', marginTop: 120 }} />
+        <Image source={require('../assets/walled.png')} style={{ width: 233, height: 57, alignSelf: 'center', marginTop: 120 }} />
         <View style={{ marginTop: 80 }}>
           {state === 'register' && (
             <TextInput
@@ -93,8 +157,8 @@ export default function Form({ state }) {
           {state === 'register' && (
             <TextInput
               style={styles.input}
-              placeholder="Avatar URL"
-              onChangeText={setAvatarUrl}
+              placeholder="Phone Number"
+              onChangeText={setPhoneNumber}
               autoCorrect={false}
               autoCapitalize="none"
             />
@@ -118,11 +182,7 @@ export default function Form({ state }) {
     </View>
   </TouchableOpacity>
 )}
-
-
-
-
-        <TouchableOpacity onPress={redirectScreen} style={styles.button}>
+        <TouchableOpacity onPress={() => (state === 'login'? handleSubmitLogin() : handleSubmitRegister())} style={styles.button}>
           <Text style={styles.buttonText}>{state === 'login' ? 'Login' : 'Register'}</Text>
         </TouchableOpacity>
 
